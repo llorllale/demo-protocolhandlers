@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>DIDComm Protocol Handlers</title>
+    <meta name="description" content="Slides of my talk about DIDComm protocol handlers.">
+    <meta name="author" content="George Aristy">
+
+    <link rel="stylesheet" href="reveal.js-3.9.2/css/reset.css">
+    <link rel="stylesheet" href="reveal.js-3.9.2/css/reveal.css">
+    <link rel="stylesheet" href="reveal.js-3.9.2/css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="reveal.js-3.9.2/lib/css/monokai.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <style>
+        /* Aside */
+        .left {
+            float: left;
+        }
+
+        img.left {
+            margin: 0;
+            padding: 0;
+            width: 25%;
+        }
+
+        img.left + ul {
+            margin: 0;
+            width: 60%;
+        }
+
+        /* Figures with captions */
+        .reveal section figure {
+            position: relative;
+            margin: 0 auto;
+            padding: 0;
+            width: 600px;
+            height: 400px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .reveal section figure > img {
+            width: 100%;
+            max-height: none;
+            border-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .reveal section figure > figcaption {
+            position: absolute;
+            bottom: 0.5em;
+            left: 0;
+            width: 100%;
+            border-style: none;
+            border-width: 0;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(37, 33, 28);
+            background-color: rgba(37, 33, 28, 0.5);
+            font-size: 0.4em;
+            text-align: center;
+        }
+
+        .reveal section figure > figcaption {
+            line-height: 1.5em;
+            vertical-align: middle;
+        }
+
+        .reveal section figure > figcaption a {
+            line-height: 1.5em !important;
+        }
+
+        /* Cover */
+        .reveal section.cover footer {
+            line-height: 33px;
+            clear: both;
+        }
+
+        .reveal section.cover > footer {
+            position: absolute;
+            bottom: 0.5em;
+            left: 0;
+            border-style: none;
+            border-width: 0;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: rgb(37, 33, 28);
+            background-color: rgba(37, 33, 28, 0.5);
+            font-size: 0.4em;
+            text-align: center;
+        }
+
+        .reveal section.cover footer img {
+            float: left;
+            margin: 0 1em 0 0;
+            padding: 0;
+            cursor: pointer;
+            border-style: none;
+        }
+
+        .reveal section.cover footer a,
+        .reveal section.cover footer span {
+            margin: 0;
+            padding: 0;
+            vertical-align: baseline;
+            line-height: 33px;
+        }
+
+        /* Separata */
+        .reveal section.separata hgroup {
+            margin-top: 0.5em;
+        }
+
+        .reveal section.separata hgroup h2,
+        .reveal section.separata hgroup h3,
+        .reveal section.separata hgroup h4 {
+            color: #F0F1EB;
+            text-shadow: #111150 0px 0px 0.2em;
+        }
+
+        .reveal section.separata figure {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .reveal section.separata figure > img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-style: none;
+            border-width: 0;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        /* Animation */
+        div.animation-container {
+            position: relative;
+            margin: 0 auto;
+            padding: 0;
+            width: 809px;
+            height: 399px;
+            background-color: transparent;
+            -moz-box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 6px 0px;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 6px 0px;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 6px 0px;
+            overflow: hidden;
+        }
+
+        .animation-container .frame,
+        .animation-container .frame > img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 0;
+            border-style: none;
+            padding: 0;
+            margin: 0;
+            min-width: 100%;
+            max-width: none;
+            max-height: none;
+            box-shadow: none
+        }
+
+        .animation-container .frame > img.loader {
+            position: absolute;
+            top: 140px;
+            left: 180px;
+            border: 0;
+            border-style: none;
+            padding: 0;
+            margin: 0;
+            width: 126px;
+            min-width: 126px;
+            box-shadow: none;
+        }
+
+        .snippet {
+            font-family: monospace !important;
+        }
+
+        .reveal table.matrix {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reveal table.matrix th.pivot {
+            border-style: none;
+        }
+
+        .reveal table.matrix th, .reveal table.matrix td {
+            border-style: solid;
+            border-width: 1px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .reveal table.matrix td li {
+            list-style: none;
+        }
+
+        .reveal pre {
+            width:100%;
+        }
+
+        .reveal .bad {
+            color: red;
+            font-style: italic;
+        }
+
+        .reveal .small {
+            font-size: 0.6em;
+        }
+
+        .reveal .highlight {
+            background-color: #606000; /*#222230;*/
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section class="cover">
+            <h1>didcomm:// Protocol Handlers</h1>
+            <small><a href="https://llorllale.github.io/talk-didcomm-protocolhandlers">https://llorllale.github.io/talk-didcomm-protocolhandlers</a></small>
+            <p>
+                <small>By <a href="https://llorllale.github.io/">George Aristy</a> /
+                    <a href="https://github.com/llorllale">llorllale</a></small>
+            </p>
+            <footer>
+                <a rel="license"
+                   href="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+                    <img alt="Creative Commons License"
+                         src="http://i.creativecommons.org/l/by-nc-sa/2.0/88x31.png"/>
+                </a>
+                <span>This work is licensed under a </span>
+                <a rel="license"
+                   href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Generic
+                    License
+                </a>
+            </footer>
+        </section>
+        <section>
+            <h2>References</h2>
+            <ul>
+                <li><a href="https://github.com/hyperledger/aries-rfcs/blob/master/concepts/0268-unified-didcomm-agent-deeplinking/README.md">Aries RFC 0268: Unified DIDCOMM Deeplinking</a></li>
+                <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler">Navigator.registerProtocolHandler()</a></li>
+                <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler/Web-based_protocol_handlers">Web-based protocol handlers</a></li>
+                <li><a href="https://html.spec.whatwg.org/multipage/system-state.html#custom-handlers">Spec</a></li>
+                <li><a href="https://caniuse.com/#feat=registerprotocolhandler">Can I use?</a></li>
+            </ul>
+        </section>
+        <section>
+            <h2>Why?</h2>
+            <ul>
+                <li><a href="https://indieweb.org/NASCAR_problem">Nascar problem</a></li>
+                <li>Discovery of web-based agents</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Usage</h2>
+            Your agent app registers itself:
+            <pre><code contenteditable>navigator.registerProtocolHandler(
+    "web+didcomm",
+    "https://www.agent.me?msg=%s",
+    "My Agent"
+);</code></pre>
+            Note: 'web+didcomm' for now because 'didcomm' is not <a href="https://html.spec.whatwg.org/multipage/system-state.html#safelisted-scheme">safe-listed</a>
+        </section>
+        <section>
+            <h2>Prompt</h2>
+            UA prompts user to accept registration:
+            <img src="img/prompt.png"/>
+        </section>
+        <section>
+            <h2>DIDComm links</h2>
+            "My Agent" will now handle all didcomm links.
+            <p>
+            Clicking on this link:
+            <pre><code contenteditable><a href="web+didcomm://?invitation=test&redirect_uri=https://www.fabercollege.edu">Connect</a> </code></pre>
+            results in a call to:
+            <pre><code contenteditable>HTTP GET https://www.agent.me?msg=web+didcomm:invitation=test&redirect_uri=https://www.fabercollege.edu</code></pre>
+        </section>
+        <section>
+            <h2>Let's see it in action</h2>
+            First register here: <a href="https://llorllale.github.io/demo-didcomm-protocolhandlers">https://llorllale.github.io/demo-didcomm-protocolhandlers</a>
+            <p>
+            Then follow the steps there.
+        </section>
+        <section>
+            <h2>Questions?</h2>
+        </section>
+    </div>
+</div>
+
+<script src="reveal.js-3.9.2/js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        hash: true,
+        dependencies: [
+            { src: 'reveal.js-3.9.2/plugin/highlight/highlight.js' },
+        ]
+    })
+</script>
+</body>
+</html>
